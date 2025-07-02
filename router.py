@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from models import User,R_model
+from models import User
 from config import conn
 from bson import ObjectId
 from serializer import userEntity,usersEntity
@@ -14,10 +14,10 @@ async def get_all_user():
 async def find_one_user(id):
     return usersEntity(conn.local.user.find_one({"_id":ObjectId(id) }))
 
-@user.post('/',response_model=R_model)
+@user.post('/')
 async def create_user(user: User):
     conn.local.user.insert_one(dict(user))
-    return 
+    return usersEntity(conn.local.user.find())
 
 @user.put('/{id}')
 async def update_user(id,user : User):
@@ -27,4 +27,4 @@ async def update_user(id,user : User):
 @user.delete('/{id}')
 async def delete_user(id,user : User):
     return userEntity(conn.local.user.find_one_and_delete({"_id":ObjectId(id)}))
-
+    
