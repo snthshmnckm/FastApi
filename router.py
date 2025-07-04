@@ -1,4 +1,4 @@
-from fastapi import APIRouter,HTTPException,logger,status
+from fastapi import APIRouter,HTTPException,status
 from models import UserCreate,UserUpdate,UserResponse
 from config import conn
 from bson import ObjectId
@@ -8,18 +8,20 @@ import logging
 
 user = APIRouter()
 user_collection = conn.local.user
+import logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.FileHandler("app.log")
-    ]
-)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.FileHandler("app.log")
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+handler.setFormatter(formatter)
+if not logger.hasHandlers():
+    logger.addHandler(handler)
 
 #Create
 @user.post('/', response_model=List[UserResponse],status_code=201)
 async def create_user(user: UserCreate): #UserCreate is the reference of our model and we are saving to the "user" variable; i.e user: UserCreate
+    
     logger.info(f"Creating user with email:{user.email}")
     user_collection.insert_one(dict(user))
     logger.debug("User inserted successfully.")
@@ -44,8 +46,8 @@ async def find_one_user(id):
 
     if not the_one:
         logger.warning("User not found: %s",id)
-        raise HTTPException(status_code=status.HTTP_status.HTTP_404_NOT_FOUND_NOT_FOUND, detail= f"No user with this {id}.")
-    logger.debug(f"User found : {the_one["email"]}")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= f"No user with this {id}.")
+    logger.debug("User found : %s",the_one["email"])
     return userEntity(the_one) 
 
 #Update
