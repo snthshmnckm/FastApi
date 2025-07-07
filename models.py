@@ -14,6 +14,10 @@ class UserUpdate(User):
 class UserResponse(User):
     id: str 
 
+class UserLogin(BaseModel):
+    email: str
+    password : str
+
 '''
     1.In order to add response model, added UserCreate,
 UserUpdate,UserResponse classes.
