@@ -22,7 +22,6 @@ if not logger.hasHandlers():
 
 user = APIRouter()
 
-
 user_collection = conn.local.user
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token") 
 
@@ -72,7 +71,7 @@ async def create_user(new_user: UserCreate, token : str= Depends(verify_token)):
     user_collection.insert_one(dict(new_user))
     logger.debug("User inserted successfully.")
     created_user = user_collection.find_one({"email" : new_user.email})
-    return usersEntity(created_user)
+    return userEntity(created_user)
 
 #Retrieve all
 @user.get('/',response_model = List[UserResponse]) # Why List? since displaying list of dict & name,email,id is enough so UserResponse model
